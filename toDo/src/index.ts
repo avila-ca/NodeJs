@@ -22,6 +22,6 @@ inputTag.addEventListener('submit', (e: any) => {
     const oneObj = new ToDoList(inputTag.value);
 
     toList.innerText = oneObj.list();
-
+    console.log(toList.innerText);
     inputForm.reset(); 
 })
