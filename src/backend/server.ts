@@ -1,20 +1,38 @@
+import dotenv from 'dotenv';
 import express from 'express';
-import { Socket } from 'node:dgram';
 import http from 'node:http';
 import { Server } from 'socket.io';
+import cors from 'cors';
+
+dotenv.config()
 
 const app = express();
 const serverHttp = http.createServer(app);
-const io = new Server(serverHttp)
 
-app.get('/', (req, res) => {
-    res.send('hello')
+const io = new Server(serverHttp, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
 })
 
 io.on('connection', (socket) => {
-    console.log('A user connected')
+    console.log(`A user connected with id: ${socket.id}`)
+    socket.on('disconnect', () => {
+        console.log(`A user disconnected with id: ${socket.id}`)
+    })
 })
 
-serverHttp.listen(3000, () => {
-    console.log('running on port: 3000')
+const port = process.env.PORT ?? 4001;
+
+app.use(cors());
+
+app.get('/', (req, res) => {
+    res.json({
+        message: 'helloddd'
+    })
+})
+
+
+serverHttp.listen(port, () => {
+    console.log(`running on port: ${port}`)
 })
