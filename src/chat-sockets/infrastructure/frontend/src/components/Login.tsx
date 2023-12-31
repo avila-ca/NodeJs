@@ -1,7 +1,13 @@
 import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
 
-export const Home = ({socket}) => {
+
+export interface SocketProps {
+    socket: Socket;
+  }
+  
+export const Login: React.FC<SocketProps> = ({ socket }) => {
     const navigate = useNavigate()
     const [userName, setUserName] = useState('')
 
@@ -15,6 +21,7 @@ export const Home = ({socket}) => {
         <>
             <form onSubmit={handleSubmit}>
                 <h2>Sign In to open the chat</h2>
+                <h3>your id: {socket.id}</h3>
                 <input type="text" name="username" value={userName} onChange={(e) => setUserName(e.target.value)}/>
                 <button>Sign In</button>
             </form>

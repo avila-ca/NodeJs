@@ -16,7 +16,11 @@ const io = new Server(serverHttp, {
 })
 
 io.on('connection', (socket) => {
-    console.log(`A user connected with id: ${socket.id}`)
+    console.log(`A user connected ---- id: ${socket.id}`)
+    socket.on('message', (data) => {
+        console.log(data)
+        io.emit('messageResponse', data)
+    })
     socket.on('disconnect', () => {
         console.log(`A user disconnected with id: ${socket.id}`)
     })
