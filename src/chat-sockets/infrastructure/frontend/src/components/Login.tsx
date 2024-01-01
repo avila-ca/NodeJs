@@ -13,8 +13,12 @@ export const Login: React.FC<SocketProps> = ({ socket }) => {
 
     const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        socket.emit('addUser', userName)
+        const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
         const userData = {name: userName, id: socket.id}
-        localStorage.setItem('userName', JSON.stringify(userData))
+        storedUsers.push(userData)
+        localStorage.setItem('userName', JSON.stringify(storedUsers))
+        console.log(  JSON.parse(localStorage.getItem('users') || '[]'), storedUsers[0].name)
         navigate('/chat')
     }
     return(

@@ -3,13 +3,17 @@ import './App.css'
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import { Login } from './components/Login'
 import { ChatInput } from './components/ChatInput'
+import { SocketProps } from './components/Login'
+export const socket = io('http://localhost:4000').connect()
 
-const socket = io()//('http://localhost:4000').connect()
-socket.on('connect', () => {
-  console.log(socket.id)
-
-})
 function App() {
+  
+  
+  let data:SocketProps;
+  socket.on('connect', () => {
+    console.log(socket.id)
+   
+  })
   return (
     <>
       <h1>Chat</h1>
