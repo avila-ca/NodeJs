@@ -1,4 +1,4 @@
-import { chatModel } from "../../mongoRepository/model/chatModel"
+/* import { chatModel } from "../../mongo/model/chatModel"
 import { Request, Response } from "express"
 
 export const createChatController = async(req: Request, res: Response) => {
@@ -22,4 +22,4 @@ export const createChatController = async(req: Request, res: Response) => {
         res.status(500).json(error)
         
     }
-}
+} */

@@ -1,4 +1,4 @@
-import { messageModel } from "../../mongoRepository/model/messageModel";
+/* import { messageModel } from "../../mongo/model/messageModel";
 import { Request, Response } from "express"
 
 export const messageController = async (req: Request, res: Response) => {
@@ -16,4 +16,4 @@ export const messageController = async (req: Request, res: Response) => {
         console.log(error);
         res.status(500).json(error)
     }
-}
+} */

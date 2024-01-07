@@ -1,6 +1,10 @@
+import { Schema } from "mongoose"
+
 export interface User {
-    name:string,
-    password:string,
-    message:string,
-    timestamp:Date
+    id?:string,
+    userName:string,
+    userPassword?:string,
+    token?:string
+    message?:string,
+    timestamp?:Date
 }

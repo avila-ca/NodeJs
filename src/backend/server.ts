@@ -1,8 +1,11 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import { json, urlencoded } from 'body-parser'
+import helmet from 'helmet'
 import { Server } from 'socket.io'
 import { createServer } from 'node:http'
+import { chatRouter } from '../chat/infrastructure/routes/Routes'
 
 dotenv.config()
 
@@ -47,7 +50,11 @@ io.on('connection', async (socket) => {
 
 })
 
+app.use(json())
+app.use(urlencoded({ extended: true }))
+app.use(helmet())
 app.use(cors())
+app.use('/', chatRouter)
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}`)
