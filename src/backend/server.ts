@@ -25,7 +25,7 @@ let arrUsers:string[] = [];
 
 io.on('connection', async (socket) => {
 
-    socket.broadcast.emit('wellcome', 'A user has connected!!!')
+  socket.broadcast.emit('wellcome', 'A user has connected!!!')
 
   socket.on('disconnect', () => {
     console.log('an user has disconnected')
@@ -45,7 +45,6 @@ io.on('connection', async (socket) => {
   })
 
   socket.on('chat message', async (msg, user) => {
-    let result
     io.emit('chat message', msg, user)
   })
 

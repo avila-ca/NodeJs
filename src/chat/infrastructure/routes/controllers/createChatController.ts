@@ -1,19 +1,19 @@
-/* import { chatModel } from "../../mongo/model/chatModel"
 import { Request, Response } from "express"
+import { useCases } from "../../dependencyInjection"
 
 export const createChatController = async(req: Request, res: Response) => {
     const {firstId, secondId} = req.body
 
     try {
-        const chat = await chatModel.findOne({
-            members: {$all: [firstId, secondId]}
+        const chat = useCases.findOne({
+            members: { $all: [firstId, secondId] }
         })
         if(chat) return res.status(200).json(chat)
-
+/* 
         const newChat = new chatModel({
             members: [firstId, secondId]
         })
-
+ */
         const response = await newChat.save()
 
         res.status(200).json(response)
@@ -22,4 +22,4 @@ export const createChatController = async(req: Request, res: Response) => {
         res.status(500).json(error)
         
     }
-} */
+}

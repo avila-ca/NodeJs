@@ -1,6 +1,6 @@
 import { ChatRepository } from "../../../domain/repository/ChatRepository";
 import { User } from "../../../domain/entity/User";
-import { userModel } from "../mongoMode/chatModel";
+import { userModel } from "../mongoMode/userModel";
 import bcrypt from 'bcrypt'
 
 export class MongoChatRepository implements ChatRepository {

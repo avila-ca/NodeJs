@@ -2,6 +2,9 @@ import { User } from "../domain/entity/User";
 import { ChatRepository } from "../domain/repository/ChatRepository";
 
 export class ChatUseCase {
+    findOne(arg0: { members: { $all: any[]; }; }) {
+        throw new Error("Method not implemented.");
+    }
     constructor(private readonly chatRepository: ChatRepository){}
 
     async postLoginUser(user:User): Promise<User | null> {

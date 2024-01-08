@@ -144,7 +144,7 @@ function App() {
         <ul>
         {arrMsg.map((value, index) => (
          value.username == user 
-            ?<li style={{listStyle: "none", color:"red"}}  key={index}>{value.username} : { value.msg}</li>
+            ?<li style={{listStyle: "none", color:"brown", textAlign:"center"}}  key={index}>{value.username} : { value.msg}</li>
             :<li style={{listStyle: "none"}}  key={index}>{value.username} : { value.msg}</li>
         ))}
         </ul>

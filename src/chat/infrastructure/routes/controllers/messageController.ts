@@ -1,5 +1,5 @@
-/* import { messageModel } from "../../mongo/model/messageModel";
 import { Request, Response } from "express"
+import { messageModel } from "../../mongo/mongoMode/messageModel"
 
 export const messageController = async (req: Request, res: Response) => {
     const {chatId, senderId, text}= req.body
@@ -16,4 +16,4 @@ export const messageController = async (req: Request, res: Response) => {
         console.log(error);
         res.status(500).json(error)
     }
-} */
+}
