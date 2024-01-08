@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import io from "socket.io-client";
 import { baseUrl, postRequest } from './utils/services';
-import { log } from 'console';
 
 
 const socket = io(baseUrl);
@@ -20,6 +19,7 @@ function App() {
   const [message,setMessage] = useState('')
   const [loginFlag, setLoginFlag] =  useState(false)
   const [registerFlag, setRegisterFlag] =  useState(false)
+  const [messageError, setMessageError] = useState('')
 
   const [arrMsg, setArrMsg] = useState<Message[]>([])
   const [sessionUsers, setSessionUsers] = useState<User[]>([])
@@ -52,10 +52,19 @@ function App() {
     const response = await postRequest(
       `${baseUrl}/login`,
       JSON.stringify({userName,userPassword})
-  )      
+      )
+    if (!response.userName) {
+     setMessageError('Invalid user name o password')
+     setTimeout(() => {
+      setMessageError('')
+     }, 2000)
+    } else {
     if(user) setLoginFlag(true)
-    socket.emit('addUser', user)
-    localStorage.setItem("User", user)
+      socket.emit('addUser', user)
+      localStorage.setItem("User", user)
+      setLoginFlag(true)
+      setRegisterFlag(true)
+    }
   }
 
   const handleSubmitMessage = (e:React.FormEvent) => {
@@ -73,8 +82,16 @@ function App() {
       `${baseUrl}/register`,
       JSON.stringify({userName,userPassword})
     )
-    socket.emit('addUser', user)
-
+    if (!response.userName) {
+      setMessageError('Invalid user name o password')
+      setTimeout(() => {
+        setMessageError('')
+      }, 2000)
+     }else {
+      socket.emit('addUser', user)
+      setRegisterFlag(true)
+      setLoginFlag(true)
+     }
   }
   const handleLogout = () => {
     localStorage.removeItem("User")
@@ -88,9 +105,11 @@ function App() {
       {(!loginFlag && !registerFlag) &&
       <>
         <form onSubmit={handleLoginUser}>
-          <h2>Login</h2>
+          <h2 >Login</h2>
+          <p style={{color: "red"}}>{messageError}</p>
+
           <input type="text" placeholder='user name' autoFocus onChange={e => setUser(e.target.value)} />
-          <input type="password" placeholder='user password' autoFocus onChange={e => setPassword(e.target.value)} />
+          <input type="password" placeholder='user password' onChange={e => setPassword(e.target.value)} />
           <button type="submit">login</button>        
         </form>
         <p>if you don't have account <a onClick={
@@ -99,31 +118,39 @@ function App() {
              }}>register</a> please</p>
       </> 
       }
-      {registerFlag &&
+      {registerFlag && !loginFlag &&
+        <>
+
         <form onSubmit={handleRegisterUser}>
           <h2>Register</h2>
+        <p style={{color: "red"}}>{messageError}</p>
           <input type="text" placeholder='user name' autoFocus onChange={e => setUser(e.target.value)} />
-          <input type="password" placeholder='user password' autoFocus onChange={e => setPassword(e.target.value)} />
+          <input type="password" placeholder='user password'  onChange={e => setPassword(e.target.value)} />
           <button type="submit">Register</button>        
         </form>
+        </>
         }
       {(loginFlag && registerFlag) && <>
-      <div>
+      <div style={{textAlign: "left"}}>
+        <h3>Users</h3>
         <ul>
           {sessionUsers.map((value, index) => (
-            <li key={index}>{value}</li>
+            <li style={{listStyle: "none"}} key={index}>{value}</li>
           ))}
         </ul>
       </div>
-      <div>
+      <div style={{textAlign: "right", listStyle: "none"}}>
+            <h2>Chat</h2>
         <ul>
         {arrMsg.map((value, index) => (
-          <li key={index}>{value.username} : { value.msg}</li>
+         value.username == user 
+            ?<li style={{listStyle: "none", color:"red"}}  key={index}>{value.username} : { value.msg}</li>
+            :<li style={{listStyle: "none"}}  key={index}>{value.username} : { value.msg}</li>
         ))}
         </ul>
       </div>
       <form onSubmit={handleSubmitMessage}>
-        <input type="text" placeholder='write message' value={message} autoFocus onChange={e => setMessage(e.target.value)}/>
+        <input type="text" placeholder='write message' value={message} size={50} autoFocus onChange={e => setMessage(e.target.value)}/>
         
       </form>
       <button onClick={handleLogout}>LogOut</button>

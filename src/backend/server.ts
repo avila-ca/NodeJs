@@ -6,6 +6,7 @@ import helmet from 'helmet'
 import { Server } from 'socket.io'
 import { createServer } from 'node:http'
 import { chatRouter } from '../chat/infrastructure/routes/Routes'
+import { auth } from './middleware/auth'
 
 dotenv.config()
 
@@ -55,6 +56,7 @@ app.use(urlencoded({ extended: true }))
 app.use(helmet())
 app.use(cors())
 app.use('/', chatRouter)
+app.use('/chat', auth, chatRouter)
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}`)

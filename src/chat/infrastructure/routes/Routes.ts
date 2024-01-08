@@ -5,10 +5,6 @@ import { loginController } from './controllers/loginController'
 //import { messageController } from './controllers/messageController'
 
 export const chatRouter = Router()
-chatRouter.post('/', (req:Request, res:Response) => {
-    console.log('hellle');
-    
-}) 
 
 chatRouter.post('/register', registerController) 
 chatRouter.post('/login', loginController)

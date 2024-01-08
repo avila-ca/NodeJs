@@ -5,8 +5,6 @@ import { log } from "console"
 export const loginController = async (req:Request, res:Response) => {
     const {userName, userPassword} = req.body
     try {
-        console.log(userName);
-        
         const user = await useCases.postLoginUser({
             userName: userName,
             userPassword: userPassword

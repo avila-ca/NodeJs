@@ -15,9 +15,7 @@ export class ChatUseCase {
 
     async postRegisterUser(user:User): Promise<User | null> {
         try {
-            const newuser = await this.chatRepository.postRegisterUser(user);
-            console.log('helpppp');
-            
+            const newuser = await this.chatRepository.postRegisterUser(user);            
             return newuser
         } catch (error) {
             throw new Error('post register method error')
