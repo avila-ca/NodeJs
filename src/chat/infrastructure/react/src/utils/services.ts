@@ -11,7 +11,8 @@ export const postRequest =async (url, body) => {
     })
 
     const data = await response.json()
-
+    console.log(response);
+    
     if (!response.ok) {
         let message = "An errr ocurred"
 

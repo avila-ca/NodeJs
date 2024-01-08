@@ -1,5 +1,4 @@
-import { Router, Request, Response } from 'express'
-import { User } from "../../../domain/entity/User";
+import { Request, Response } from 'express'
 import { useCases } from "../../dependencyInjection";
 
 export const registerController = async (req: Request, res: Response) => {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import io from "socket.io-client";
 import { baseUrl, postRequest } from './utils/services';
+import { log } from 'console';
 
 
 const socket = io(baseUrl);
@@ -46,10 +47,12 @@ function App() {
   }, [arrMsg, sessionUsers])
   const handleLoginUser = async(e:React.FormEvent) => {
     e.preventDefault()
+    const userName = user
+    const userPassword = password
     const response = await postRequest(
       `${baseUrl}/login`,
-      JSON.stringify({user,password})
-  )
+      JSON.stringify({userName,userPassword})
+  )      
     if(user) setLoginFlag(true)
     socket.emit('addUser', user)
     localStorage.setItem("User", user)
@@ -64,11 +67,13 @@ function App() {
 
   const handleRegisterUser = async (e:React.FormEvent) => {
     e.preventDefault()
+    const userName = user
+    const userPassword = password
     const response = await postRequest(
       `${baseUrl}/register`,
-      JSON.stringify({user,password})
-  )
-        socket.emit('addUser', user)
+      JSON.stringify({userName,userPassword})
+    )
+    socket.emit('addUser', user)
 
   }
   const handleLogout = () => {
