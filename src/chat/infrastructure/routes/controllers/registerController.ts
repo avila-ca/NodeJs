@@ -12,7 +12,7 @@ export const registerController = async (req: Request, res: Response) => {
         if (!user) return res.status(400).json("User name already exists")
         if (!userName || !userPassword) return res.status(400).json("All fields are required")
        
-        res.status(200).json({userName})
+        res.status(200).json({user})
     } catch (error) {
         console.log(error);
         res.status(500).json(error)

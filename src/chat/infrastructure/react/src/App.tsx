@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import io from "socket.io-client";
 import { baseUrl, postRequest } from './utils/services';
+import { log } from 'console';
+import { response } from 'express';
 
 
 const socket = io(baseUrl);
@@ -13,7 +15,9 @@ interface Message {
 interface User {
   user:string
 }
+
 function App() {
+  
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
   const [message,setMessage] = useState('')
@@ -23,7 +27,7 @@ function App() {
 
   const [arrMsg, setArrMsg] = useState<Message[]>([])
   const [sessionUsers, setSessionUsers] = useState<User[]>([])
-
+  
   useEffect(() => {
     socket.on("chat message", (msg, username) => {
       setArrMsg([...arrMsg, {username, msg}])
@@ -53,7 +57,7 @@ function App() {
       `${baseUrl}/login`,
       JSON.stringify({userName,userPassword})
       )
-    if (!response.userName) {
+    if (!response.user.userName) {
      setMessageError('Invalid user name o password')
      setTimeout(() => {
       setMessageError('')
@@ -61,7 +65,8 @@ function App() {
     } else {
     if(user) setLoginFlag(true)
       socket.emit('addUser', user)
-      localStorage.setItem("User", user)
+      console.log('aqiii handleLogin',response.user)
+      localStorage.setItem("User", JSON.stringify(response.user))
       setLoginFlag(true)
       setRegisterFlag(true)
     }
@@ -81,17 +86,23 @@ function App() {
     const response = await postRequest(
       `${baseUrl}/register`,
       JSON.stringify({userName,userPassword})
-    )
-    if (!response.userName) {
-      setMessageError('Invalid user name o password')
-      setTimeout(() => {
-        setMessageError('')
-      }, 2000)
-     }else {
-      socket.emit('addUser', user)
-      setRegisterFlag(true)
-      setLoginFlag(true)
-     }
+    ).then((response) => {
+      if (!response.user.userName) {
+        setMessageError('Invalid user name o password')
+        setTimeout(() => {
+          setMessageError('')
+        }, 2000)
+      }
+      return response
+    })
+    .then((data) => { 
+      if (data) {
+        socket.emit('addUser', user)
+        localStorage.setItem("User", JSON.stringify(response.user))
+        setRegisterFlag(true)
+        setLoginFlag(true)
+      }
+    })
   }
   const handleLogout = () => {
     localStorage.removeItem("User")
