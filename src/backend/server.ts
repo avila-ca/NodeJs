@@ -7,6 +7,7 @@ import { Server } from 'socket.io'
 import { createServer } from 'node:http'
 import { chatRouter } from '../chat/infrastructure/routes/Routes'
 import { auth } from './middleware/auth'
+import { messageModel } from '../chat/infrastructure/mongo/mongoMode/messageModel'
 
 dotenv.config()
 
@@ -22,30 +23,43 @@ const io = new Server(server, {
 })
 
 let arrUsers:string[] = [];
+const defaultSession = 'defaultSession'
 
 io.on('connection', async (socket) => {
 
   socket.broadcast.emit('wellcome', 'A user has connected!!!')
+  socket.join(defaultSession)
+
+  const previousMessages = await messageModel.find({ chatId: defaultSession }).sort({ createdAt: 1 }).exec();
+  socket.emit('previousMessages', previousMessages);
 
   socket.on('disconnect', () => {
     console.log('an user has disconnected')
   })
 
   socket.on('addUser', (data) => {
-    console.log(data)
     arrUsers.push(data)
-    io.emit('newUser', arrUsers)
+    io.to(defaultSession).emit('newUser', arrUsers)
   }) 
 
   socket.on('deletedUser', (data) => {
     console.log(data)
     arrUsers = arrUsers.filter(value => value != data)
-    socket.emit('currentUsers', arrUsers)
+    socket.to(defaultSession).emit('currentUsers', arrUsers)
 
   })
 
   socket.on('chat message', async (msg, user) => {
-    io.emit('chat message', msg, user)
+    const message = {
+      chatId: 'defaultRoom', 
+      users: [user], 
+      senderId: socket.id, 
+      text: msg,
+    };
+  
+    const savedMessage = await messageModel.create(message);
+  
+    io.to(defaultSession).emit('chat message', msg, user)
   })
 
 })
