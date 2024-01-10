@@ -95,7 +95,7 @@ function App() {
     };
     await postRequest(
       `${baseUrl}/chat`,
-      JSON.stringify({messageInfo})
+      JSON.stringify(messageInfo)
     ).then((response) => {
       if (!response.user.userName) {
         setMessageError('Invalid user name o password')
