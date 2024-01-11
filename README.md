@@ -1,83 +1,106 @@
-# Ejemplo básico de TS
+# SPRINT 7 CHAT
 
----
+### 📋Description
 
-En este ejemplo básico hay:
+It is a web that implements a multi-client chat with sockets protocol to chat with others directly, and http protocol to save all info in the MongoDB. The implemented functionalities are detailed below:
 
-- ESLint
-- Prettier
-- ts-jest
-- nodemon
-- VSCode Debugging
-- Github Actions
-- Pequeño ejemplo de código funcional con import
+   - POST /userRegister: Register a client. Requires a body with {"name":"testName","password":"testPassword"}.
+   - POST /userLogin: Login as a client. Requires a body with {"name":"testName","password":"testPassword"}.
+   - POST /chat: Create a message. 
+   - GET /chat/:id : Get the all previous messages. Requires a id param, it correspond to name room.
 
-La configuración del debugger apunta a src/index.ts como archivo de inicio del proyecto.
 
-Comandos:
+### 📥 Installation
 
-Testing:
 
-```sh
+To get started with this template, you first need to clone the repository:
+
+```bash
+git clone https://github.com/avila-ca/sockets-chat.git
+```
+
+Then, install the project dependencies:
+
+
+```bash
+cd sockets-chat
+ npm install
+```
+
+```bash
+cd /src/chat/infrastructure/react
+npm install
+```
+
+Rename the .env-template file into .env. Then complete the MONGO_URI with your credentials.
+
+
+### 🏁 How To Start
+
+To start the server and client in development mode, run the following script:
+
+```bash
+cd sockets-chat
+npm run dev
+```
+
+
+```bash
+cd /src/chat/infrastructure/react
+npm run dev
+```
+
+Then, open http://localhost:5173 to access the client.
+
+###  Tests
+
+To perform the tests, the environment variable DATABASE must be set to DATABASE='mongodb'.
+
+```bash
 npm run test
 ```
 
-Ejecuta los tests ignorando los que existan en dist/
 
-Prettier format:
 
-```sh
-npm run prettier-format
-```
+### 📝 Dependencies
 
-Ejecuta manualmente el prettier en el proyecto, recomiendo instalar la extensión prettier y que se autoejecute al guardar.
+- cors: middleware for handling Cross-Origin Resource Sharing (CORS)
 
-Watcher:
+- socket.io: enables real-time bidirectional event-based communication.
 
-```sh
-npm run dev:watcher
-```
+- dotenv: loads environment variables from a .env file
 
-Ejecuta nodemon usando src/index.ts como archivo inicial
+- express: web framework for Node.js
 
-Dev Run:
+- express-promise-router: promise-based router for Express
 
-```sh
-npm run dev:run
-```
+- helmet: middleware for adding security headers
 
-Ejecuta el proyecto sin watcher
+- mongodb: driver for MongoDB
 
-Build:
+- mysql: driver for MySQL
 
-```sh
-npm run build
-```
 
-Transpila el proyecto en dist/
+### 🛠️ Dev Dependencies
 
----
+- @types/cors: TypeScript definitions for cors
 
-## Debugger
+- @types/express: TypeScript definitions for express
 
-en el archivo .vscode/launch.json está la configuración del debugger.
+- @types/jest: TypeScript definitions for jest
 
-```json
-{
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Lanza debug",
-      "preLaunchTask": "tsc: build - tsconfig.json",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/src/index.ts",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-    }
-  ]
-}
-```
+- @types/mysql: TypeScript definitions for mysql
+
+- eslint: linter for TypeScript
+
+- eslint-config-codely: ESLint configuration used by CodelyTV
+
+- mysql: MySQL driver for Node.js
+
+- ts-jest: TypeScript preprocessor for Jest
+
+- ts-node-dev: TypeScript execution and development environment for Node.js
+
+- tsc-watch: TypeScript compiler with file watching
+
+
