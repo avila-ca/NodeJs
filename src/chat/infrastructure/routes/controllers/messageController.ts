@@ -1,19 +1,20 @@
-import { Request, Response } from "express"
-import { messageModel } from "../../mongo/mongoMode/messageModel"
+import { Request, Response } from 'express';
+import { useCases } from '../../dependencyInjection';
 
 export const messageController = async (req: Request, res: Response) => {
-    const {chatId, senderId, text}= req.body
-
-    const message = new messageModel({
-        chatId, senderId, text
-    })
-
-    try {
-        await message.save()
-        const messages = await messageModel.find({chatId})
-        res.status(200).json(messages)
-    } catch (error){
-        console.log(error);
-        res.status(500).json(error)
-    }
-}
+  const { chatId, users, senderId, text } = req.body;
+  try {
+    //await message.save();
+    //const messages = await messageModel.find({ chatId });
+    const messageInfo = await useCases.postMessage({
+      chatId: chatId,
+      users: users,
+      senderId: senderId,
+      text: text
+    });
+    res.status(200).json(messageInfo);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};

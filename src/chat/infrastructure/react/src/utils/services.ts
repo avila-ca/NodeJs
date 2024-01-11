@@ -27,3 +27,29 @@ export const postRequest =async (url, body) => {
     return data
 }
 
+export const getRequest =async (url) => {
+    const response = await fetch(url, {
+        method:"GET",
+        headers:{
+            "Content-Type": "application/json"
+        },
+    })
+
+    const data = await response.json()
+    console.log('en services fetch', response);
+    
+    if (!response.ok) {
+        let message = "An errr ocurred"
+
+        if (data?.message) {
+            message = data.message
+        }else{
+            message = data
+        }
+
+        return {error: true, message}
+    }
+    return data
+}
+
+

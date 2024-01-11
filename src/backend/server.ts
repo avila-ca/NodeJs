@@ -1,76 +1,73 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import { json, urlencoded } from 'body-parser'
-import helmet from 'helmet'
-import { Server } from 'socket.io'
-import { createServer } from 'node:http'
-import { chatRouter } from '../chat/infrastructure/routes/Routes'
-import { auth } from './middleware/auth'
-import { messageModel } from '../chat/infrastructure/mongo/mongoMode/messageModel'
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { json, urlencoded } from 'body-parser';
+import helmet from 'helmet';
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
+import { chatRouter } from '../chat/infrastructure/routes/Routes';
+import { auth } from './middleware/auth';
+import { messageModel } from '../chat/infrastructure/mongo/mongoMode/messageModel';
 
-dotenv.config()
+dotenv.config();
 
-const port = process.env.PORT ?? 4001
+const port = process.env.PORT ?? 4001;
 
-const app = express()
-const server = createServer(app)
+const app = express();
+const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*"
+    origin: '*'
   }
-})
+});
 
-let arrUsers:string[] = [];
-const defaultSession = 'defaultSession'
+let arrUsers: string[] = [];
+const defaultSession = 'defaultSession';
 
 io.on('connection', async (socket) => {
+  socket.broadcast.emit('wellcome', 'A user has connected!!!');
+  socket.join(defaultSession);
 
-  socket.broadcast.emit('wellcome', 'A user has connected!!!')
-  socket.join(defaultSession)
-
-  const previousMessages = await messageModel.find({ chatId: defaultSession }).sort({ createdAt: 1 }).exec();
-  socket.emit('previousMessages', previousMessages);
+  // const previousMessages = await messageModel.find({ chatId: defaultSession }).sort({ createdAt: 1 }).exec();
+  // socket.emit('previousMessages', previousMessages);
 
   socket.on('disconnect', () => {
-    console.log('an user has disconnected')
-  })
+    console.log('an user has disconnected');
+  });
 
   socket.on('addUser', (data) => {
-    arrUsers.push(data)
-    io.to(defaultSession).emit('newUser', arrUsers)
-  }) 
+    arrUsers.push(data);
+    io.to(defaultSession).emit('newUser', arrUsers);
+  });
 
   socket.on('deletedUser', (data) => {
-    console.log(data)
-    arrUsers = arrUsers.filter(value => value != data)
-    socket.to(defaultSession).emit('currentUsers', arrUsers)
-
-  })
+    console.log(data);
+    arrUsers = arrUsers.filter((value) => value != data);
+    socket.to(defaultSession).emit('currentUsers', arrUsers);
+  });
 
   socket.on('chat message', async (msg, user) => {
-    const message = {
-      chatId: 'defaultRoom', 
-      users: [user], 
-      senderId: socket.id, 
-      text: msg,
-    };
-  
-    const savedMessage = await messageModel.create(message);
-  
-    io.to(defaultSession).emit('chat message', msg, user)
-  })
+    // const message = {
+    //   chatId: 'defaultRoom',
+    //   users: [user],
+    //   senderId: socket.id,
+    //   text: msg
+    // };
 
-})
+    //    const savedMessage = await messageModel.create(message);
 
-app.use(json())
-app.use(urlencoded({ extended: true }))
-app.use(helmet())
-app.use(cors())
-app.use('/', chatRouter)
-app.use('/chat', auth, chatRouter)
+    io.to(defaultSession).emit('chat message', msg, user);
+  });
+});
+
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(helmet());
+app.use(cors());
+app.use('/', chatRouter);
+app.use('/chat', auth, chatRouter);
 
 server.listen(port, () => {
-  console.log(`Server running on port ${port}`)
-})
+  console.log(`Server running on port ${port}`);
+});

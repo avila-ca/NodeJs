@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import io from "socket.io-client";
-import { baseUrl, postRequest } from './utils/services';
+import { baseUrl, getRequest, postRequest } from './utils/services';
 
 const socket = io(baseUrl);
 
@@ -47,13 +47,13 @@ function App() {
       console.info('en currentUsers on: ',sessionUsers, users);
 
     })
-    socket.on('previousMessages', (previousMessages) => {
-      setArrMsg(previousMessages);
-    });
+    // socket.on('previousMessages', (previousMessages) => {
+    //   setArrMsg(previousMessages);
+    // });
     return () => {
       socket.off("chat message");
       socket.off('newUser');
-      socket.off('currentUsers')
+      socket.off('currentUsers');
     }
   }, [arrMsg, sessionUsers])
   const handleLoginUser = async(e:React.FormEvent) => {
@@ -75,14 +75,29 @@ function App() {
       })
       .then((data) => {
         if(user) setLoginFlag(true)
-          socket.emit('addUser', user, defaultSession)
-          console.log('aqiii handleLogin',data.user)
-          localStorage.setItem("User", JSON.stringify(data.user))
-          setLoginFlag(true)
-          setRegisterFlag(true)
-        })
+        socket.emit('addUser', user, defaultSession)
+        console.log('aqiii handleLogin',data.user)
+        localStorage.setItem("User", JSON.stringify(data.user))
+        setLoginFlag(true)
+        setRegisterFlag(true)
+        previousMessages()
+      })
     }
-
+  
+  
+    const previousMessages = async () => { 
+      const oldMsg = await getRequest(`${baseUrl}/chat/${defaultSession}`)
+          
+      if (!oldMsg.ok) {
+        setMessageError('Empty previous messages')
+        setTimeout(() => {
+          setMessageError('')
+        }, 2000)
+      } else {
+        console.log(oldMsg)
+        setArrMsg([oldMsg])
+      }
+    }
   const handleSubmitMessage = async(e:React.FormEvent) => {
     e.preventDefault()
     //const userInfo = localStorage.getItem('User')
@@ -95,9 +110,9 @@ function App() {
     };
     await postRequest(
       `${baseUrl}/chat`,
-      JSON.stringify({messageInfo})
+      JSON.stringify(messageInfo)
     ).then((response) => {
-      if (!response.user.userName) {
+      if (!response.messageInfo) {
         setMessageError('Invalid user name o password')
         setTimeout(() => {
           setMessageError('')
@@ -107,8 +122,6 @@ function App() {
     })
     .then((data) => { 
       if (data) {
-        socket.emit('addUser', user, defaultSession)
-        localStorage.setItem("User", JSON.stringify(data.user))
         setRegisterFlag(true)
         setLoginFlag(true)
       }
@@ -139,9 +152,11 @@ function App() {
         localStorage.setItem("User", JSON.stringify(data.user))
         setRegisterFlag(true)
         setLoginFlag(true)
+        previousMessages()
       }
     })
   }
+
   const handleLogout = () => {
     localStorage.removeItem("User")
     socket.emit('deletedUser', user)
