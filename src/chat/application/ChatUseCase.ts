@@ -3,6 +3,7 @@ import { User } from '../domain/entity/User';
 import { ChatRepository } from '../domain/repository/ChatRepository';
 
 export class ChatUseCase {
+  
   constructor(private readonly chatRepository: ChatRepository) {}
 
   async postLoginUser(user: User): Promise<User | null> {

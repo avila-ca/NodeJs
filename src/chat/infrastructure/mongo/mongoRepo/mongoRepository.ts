@@ -57,7 +57,7 @@ export class MongoChatRepository implements ChatRepository {
   }
 
   async postMessage(messageInfo: Message): Promise<Message | null> {
-    console.log(messageInfo);
+    //console.log(messageInfo);
     const session = await messageModel.findOne({ chatId: messageInfo.chatId });
     if (!session) return null;
     const createMessage = await messageModel.create(messageInfo);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import io from "socket.io-client";
-import { baseUrl, getRequest, postRequest } from './utils/services';
+import { baseUrl, getRequest, postHeaderRequest, postRequest } from './utils/services';
 
 const socket = io(baseUrl);
 
@@ -15,23 +15,16 @@ interface User {
 const defaultSession = 'defaultSession'
 
 function App() {
-  //let userInfo = localStorage.getItem('User')
-  
+ 
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
   const [message,setMessage] = useState('')
   const [loginFlag, setLoginFlag] =  useState(false)
   const [registerFlag, setRegisterFlag] =  useState(false)
   const [messageError, setMessageError] = useState('')
-
   const [arrMsg, setArrMsg] = useState<Message[]>([])
   const [sessionUsers, setSessionUsers] = useState<User[]>([])
-
-  /* if(userInfo){
-    userInfo = JSON.parse(userInfo)
-    setLoginFlag(true)
-    setRegisterFlag(true)
-  } */
+    
   useEffect(() => {
     socket.on("chat message", (msg, username) => {
       setArrMsg([...arrMsg, {username, msg}])
@@ -47,9 +40,7 @@ function App() {
       console.info('en currentUsers on: ',sessionUsers, users);
 
     })
-    // socket.on('previousMessages', (previousMessages) => {
-    //   setArrMsg(previousMessages);
-    // });
+   
     return () => {
       socket.off("chat message");
       socket.off('newUser');
@@ -65,7 +56,7 @@ function App() {
       JSON.stringify({userName,userPassword})
       )
       .then((response) => {
-        if (!response.user.userName) {
+        if (response.error) {
          setMessageError('Invalid user name or password')
          setTimeout(() => {
           setMessageError('')
@@ -74,19 +65,25 @@ function App() {
         return response
       })
       .then((data) => {
-        if(user) setLoginFlag(true)
-        socket.emit('addUser', user, defaultSession)
-        console.log('aqiii handleLogin',data.user)
-        localStorage.setItem("User", JSON.stringify(data.user))
-        setLoginFlag(true)
-        setRegisterFlag(true)
-        previousMessages()
+        if(data.user.userName) {
+          setLoginFlag(true)
+          socket.emit('addUser', user, defaultSession)
+          console.log('aqiii handleLogin',data.user.userName)
+          localStorage.setItem("User", JSON.stringify(data.user))
+          setLoginFlag(true)
+          setRegisterFlag(true)
+          previousMessages()
+        }
       })
     }
   
   
     const previousMessages = async () => { 
-      const oldMsg = await getRequest(`${baseUrl}/chat/${defaultSession}`)
+      let userInfo = localStorage.getItem('User')
+
+      const oldMsg = await getRequest(
+        `${baseUrl}/chat/${defaultSession}`,
+        userInfo)
           
       if (!oldMsg.ok) {
         setMessageError('Empty previous messages')
@@ -100,17 +97,19 @@ function App() {
     }
   const handleSubmitMessage = async(e:React.FormEvent) => {
     e.preventDefault()
-    //const userInfo = localStorage.getItem('User')
-    console.info('en el handleMessage', sessionUsers);
+    let userInfo = localStorage.getItem('User')
+    
+    console.info('en el handleMessage', sessionUsers, userInfo);
     const messageInfo = {
       chatId: 'defaultRoom', 
       users: [user], 
       senderId: socket.id, 
       text: message,
     };
-    await postRequest(
+    await postHeaderRequest(
       `${baseUrl}/chat`,
-      JSON.stringify(messageInfo)
+      JSON.stringify(messageInfo),
+      userInfo
     ).then((response) => {
       if (!response.messageInfo) {
         setMessageError('Invalid user name o password')
@@ -138,7 +137,7 @@ function App() {
       `${baseUrl}/register`,
       JSON.stringify({userName,userPassword})
     ).then((response) => {
-      if (!response.user.userName) {
+      if (response.error) {
         setMessageError('Invalid user name o password')
         setTimeout(() => {
           setMessageError('')
@@ -147,7 +146,7 @@ function App() {
       return response
     })
     .then((data) => { 
-      if (data) {
+      if (data.user.userName) {
         socket.emit('addUser', user, defaultSession)
         localStorage.setItem("User", JSON.stringify(data.user))
         setRegisterFlag(true)

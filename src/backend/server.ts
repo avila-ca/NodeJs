@@ -7,7 +7,6 @@ import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 import { chatRouter } from '../chat/infrastructure/routes/Routes';
 import { auth } from './middleware/auth';
-import { messageModel } from '../chat/infrastructure/mongo/mongoMode/messageModel';
 
 dotenv.config();
 
@@ -48,15 +47,7 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('chat message', async (msg, user) => {
-    // const message = {
-    //   chatId: 'defaultRoom',
-    //   users: [user],
-    //   senderId: socket.id,
-    //   text: msg
-    // };
-
-    //    const savedMessage = await messageModel.create(message);
-
+    
     io.to(defaultSession).emit('chat message', msg, user);
   });
 });
